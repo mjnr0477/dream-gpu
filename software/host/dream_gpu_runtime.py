@@ -150,7 +150,7 @@ def make_handler(device: DreamGpuDevice, api_token: str | None = None):
 
             try:
                 with device_lock:
-                    device.stop()
+                    device.reset()
                     device.load_program(instructions)
                     for lane_id, words in enumerate(lane_memory):
                         for offset, word in enumerate(words):

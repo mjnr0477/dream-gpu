@@ -32,6 +32,16 @@ module tb_dream_gpu_v14_uart;
     end
     endtask
 
+    task send_last_byte(input [7:0] value);
+    begin
+        uart_rx=0; #(BIT_NS);
+        for (i=0;i<8;i=i+1) begin
+            uart_rx=value[i]; #(BIT_NS);
+        end
+        uart_rx=1; #(BIT_NS/2);
+    end
+    endtask
+
     task receive_byte(output [7:0] value);
     integer j;
     begin
@@ -54,7 +64,7 @@ module tb_dream_gpu_v14_uart;
         send_byte(8'hD5); send_byte(8'hA5);
         send_byte(8'h02); send_byte(address);
         send_byte(value[7:0]); send_byte(value[15:8]);
-        send_byte(value[23:16]); send_byte(value[31:24]);
+        send_byte(value[23:16]); send_last_byte(value[31:24]);
         receive_byte(status);
         if (status!==0) $fatal(1,"UART write status failure");
     end
@@ -65,7 +75,7 @@ module tb_dream_gpu_v14_uart;
     begin
         $display("SEND READ addr=%02x",address);
         send_byte(8'hD5); send_byte(8'hA5);
-        send_byte(8'h01); send_byte(address);
+        send_byte(8'h01); send_last_byte(address);
         receive_byte(status);
         receive_byte(b0); receive_byte(b1);
         receive_byte(b2); receive_byte(b3);

@@ -9,7 +9,8 @@ An experimental four-lane GPU-style processor implemented in Verilog RTL.
 - v0.8: Lane-private memory — verified.
 - v0.9: Reliability and fault protection — verified.
 - v1.0: Candidate with signed MACI multiply-accumulate instruction; regression and synthesis checks run in GitHub Actions.
-- v1.1: Four independent lane execution units with simultaneous instruction issue; parallel execution and private-memory MACI tests are in GitHub Actions.
+- v1.1: Four independent lane execution units with simultaneous instruction issue; parallel execution and private-memory MACI tests passed.
+- v1.2: Memory-mapped host interface prototype for loading programs/data, launching execution, and reading results; CI verification pending.
 
 DREAM GPU is currently a simulated RTL design, not a physical GPU, FPGA bitstream, or fabricated ASIC.
 
@@ -18,6 +19,7 @@ DREAM GPU is currently a simulated RTL design, not a physical GPU, FPGA bitstrea
 - rtl/ — processor RTL
 - rtl/v1_0/ — v1.0 candidate
 - rtl/v1_1/ — four-lane parallel execution prototype
+- rtl/v1_2/ — host-accessible parallel engine and memory-mapped interface
 - verification/ — testbenches
 - verification/v1_0/ — v1.0 regression tests
 - releases/ — versioned archives and SHA-256 checksums
@@ -73,4 +75,9 @@ No license has been declared. Public availability does not automatically grant p
     vvp /tmp/dream_gpu_v11.vvp
 
 The v1.1 test checks that all four lane PCs advance on the same clock edge, complete 12 lane-instructions in 3 clocks, and use separate private-memory banks for MACI. See architecture/v1_1_parallel_architecture.md.
+
+
+## v1.2 host interface
+
+The v1.2 host interface exposes a simple 32-bit memory-mapped register bus. It supports instruction loading, lane-private memory read/write, execution control, status, counters, program counters, and accumulator readback. See architecture/v1_2_host_interface.md for the register map and programming sequence.
 

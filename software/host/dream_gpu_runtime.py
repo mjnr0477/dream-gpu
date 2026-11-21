@@ -57,6 +57,28 @@ def _validate_execution(payload: Any) -> tuple[list[int], list[list[int]], int]:
     return instructions, checked_memory, max_polls
 
 
+def _validate_matrix_request(payload: Any):
+    if not isinstance(payload, dict):
+        raise ValueError("request body must be a JSON object")
+    matrices = []
+    for key in ("a", "b"):
+        matrix = payload.get(key)
+        if not isinstance(matrix, list) or len(matrix) != 4:
+            raise ValueError(f"{key} must be a 4x4 matrix")
+        checked = []
+        for row in matrix:
+            if not isinstance(row, list) or len(row) != 4:
+                raise ValueError(f"{key} must be a 4x4 matrix")
+            if any(isinstance(v, bool) or not isinstance(v, int) or not -128 <= v <= 127 for v in row):
+                raise ValueError("INT8 matrix elements must be integers in range -128..127")
+            checked.append(row)
+        matrices.append(checked)
+    max_polls = payload.get("max_polls", 10000)
+    if isinstance(max_polls, bool) or not isinstance(max_polls, int) or not 1 <= max_polls <= MAX_POLLS:
+        raise ValueError(f"max_polls must be an integer from 1 to {MAX_POLLS}")
+    return matrices[0], matrices[1], max_polls
+
+
 def make_handler(device: DreamGpuDevice, api_token: str | None = None):
     device_lock = threading.Lock()
 
@@ -138,6 +160,22 @@ def make_handler(device: DreamGpuDevice, api_token: str | None = None):
         def do_POST(self):
             if not self._authorized():
                 self._send(401, {"error": "unauthorized"})
+                return
+            if self.path == "/v1/matmul/int8":
+                try:
+                    matrix_a, matrix_b, max_polls = _validate_matrix_request(self._read_json())
+                except ValueError as exc:
+                    self._send(400, {"error": "invalid_request", "detail": str(exc)})
+                    return
+                try:
+                    with device_lock:
+                        result = device.run_int8_matmul(matrix_a, matrix_b, max_polls=max_polls)
+                    self._send(200, {"ok": True, "dtype": "int32", "shape": [4, 4],
+                                     "matrix": [list(row) for row in result]})
+                except TimeoutError as exc:
+                    self._send(504, {"error": "tensor_timeout", "detail": str(exc)})
+                except Exception as exc:
+                    self._send(503, {"error": "device_unavailable", "detail": str(exc)})
                 return
             if self.path != "/v1/execute":
                 self._send(404, {"error": "not_found"})

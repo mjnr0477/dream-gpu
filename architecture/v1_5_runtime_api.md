@@ -24,7 +24,7 @@ reverse proxy and firewall; the built-in HTTP server is not TLS.
   until board-level acceptance testing is completed.
 - `POST /v1/execute` — loads a raw instruction program, optionally preloads
   up to 64 words for each of four lane-private memories, starts execution,
-  waits for completion, and returns accumulators, PCs and counters.
+  soft-resets the engine, loads the program, waits for completion, and returns accumulators, PCs and counters.
 
 Example JSON body:
 
@@ -57,4 +57,7 @@ They do not establish that a real FPGA exists or is connected.
 
 - `POST /v1/matmul/int8` accepts two 4x4 matrices named `a` and `b`, with signed INT8 values in the range -128..127.
 - Returns a 4x4 signed INT32 matrix.
-- The v1.6 tensor block computes one output row per clock over four clocks. It is a small fixed-point building block, not a complete neural-network accelerator.
+- The v1.6 tensor block uses 16 signed 8x8 multipliers to compute one output row per clock over four clocks. It is a small fixed-point building block, not a complete neural-network accelerator.
+
+
+The application-facing client is `software/host/dream_gpu_client.py`; it provides `health()`, `matmul_int8()`, and `execute()` methods for a future application adapter. See `architecture/v1_6_application_client.md`.

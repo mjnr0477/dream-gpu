@@ -63,7 +63,9 @@ class RuntimeApiTests(unittest.TestCase):
         status, payload = self.request("GET", "/health")
         self.assertEqual(status, 200)
         self.assertTrue(payload["device_responding"])
-        self.assertEqual(payload["capabilities"]["lanes"], 4)\n        self.assertTrue(payload["capabilities"]["tensor_acceleration"])\n        self.assertEqual(payload["api_version"], "1.6")
+        self.assertEqual(payload["capabilities"]["lanes"], 4)
+        self.assertTrue(payload["capabilities"]["tensor_acceleration"])
+        self.assertEqual(payload["api_version"], "1.6")
         self.assertFalse(payload["capabilities"]["physical_fpga_verified"])
 
     def test_execute_program(self):

@@ -72,6 +72,7 @@ class RuntimeApiTests(unittest.TestCase):
         })
         self.assertEqual(status, 200)
         self.assertEqual(payload["accumulators"], [11, 21, 31, 41])
+        self.assertIn((0x00, 2), self.transport.writes)
         self.assertIn((0x20, 0), self.transport.writes)
         self.assertIn((0x00, 1), self.transport.writes)
 

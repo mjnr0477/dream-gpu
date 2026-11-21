@@ -104,6 +104,11 @@ class DreamGpuDevice:
         self.write_register(self.DMEM_ADDR, self._lane_offset(lane, offset))
         return self.read_register(self.DMEM_READ)
 
+    def reset(self) -> None:
+        """Pulse the host soft-reset bit; clears program and lane memories."""
+        self.write_register(self.CONTROL, 2)
+        self.write_register(self.CONTROL, 0)
+
     def start(self) -> None:
         self.write_register(self.CONTROL, 1)
 

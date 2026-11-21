@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Test portable host driver
+      - name: Test portable host driver and UART transport
         run: python -m unittest discover -s verification/software -v
 
   iverilog:
@@ -56,8 +56,16 @@ jobs:
           vvp /tmp/dream_gpu_v12.vvp | tee /tmp/dream_gpu_v12.log
           grep -F "DREAM GPU v1.2 HOST INTERFACE TEST PASS" /tmp/dream_gpu_v12.log
           ! grep -F "FAIL" /tmp/dream_gpu_v12.log
+      - name: Run v1.4 UART host bridge verification
+        run: |
+          set -euo pipefail
+          iverilog -g2012 -s tb_dream_gpu_v14_uart -o /tmp/dream_gpu_v14.vvp rtl/v1_1/dream_gpu_lane_v11.v rtl/v1_2/dream_gpu_engine_v12.v rtl/v1_2/dream_gpu_host_v12.v rtl/v1_4/dream_gpu_uart_host_v14.v verification/v1_4/tb_dream_gpu_v14_uart.v
+          vvp /tmp/dream_gpu_v14.vvp | tee /tmp/dream_gpu_v14.log
+          grep -F "DREAM GPU v1.4 UART HOST BRIDGE TEST PASS" /tmp/dream_gpu_v14.log
+          ! grep -F "FAIL" /tmp/dream_gpu_v14.log
       - name: Synthesis and structural checks
         run: |
           yosys -p 'read_verilog rtl/v1_0/dream_gpu_core_v10.v rtl/v1_0/dream_gpu_engine_v10.v; hierarchy -check -top dream_gpu_engine_v10; proc; check; synth -top dream_gpu_engine_v10; stat'
           yosys -p 'read_verilog rtl/v1_1/dream_gpu_lane_v11.v rtl/v1_1/dream_gpu_engine_v11.v; hierarchy -check -top dream_gpu_engine_v11; proc; check; synth -top dream_gpu_engine_v11; stat'
           yosys -p 'read_verilog rtl/v1_1/dream_gpu_lane_v11.v rtl/v1_2/dream_gpu_engine_v12.v rtl/v1_2/dream_gpu_host_v12.v; hierarchy -check -top dream_gpu_host_v12; proc; check; stat'
+          yosys -p 'read_verilog rtl/v1_1/dream_gpu_lane_v11.v rtl/v1_2/dream_gpu_engine_v12.v rtl/v1_2/dream_gpu_host_v12.v rtl/v1_4/dream_gpu_uart_host_v14.v; hierarchy -check -top dream_gpu_uart_host_v14; proc; check; stat'

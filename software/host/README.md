@@ -7,7 +7,7 @@ memory-mapped host register interface.
 
 - Loads up to 256 32-bit instructions.
 - Writes and reads the four 64-word lane-private data banks.
-- Starts/stops execution and polls completion/fault status.
+- Soft-resets the engine, starts/stops execution, and polls completion/fault status.
 - Reads lane accumulators, program counters, and performance counters.
 - Validates register values and memory/index bounds before bus access.
 
@@ -32,7 +32,7 @@ protocol only; it is not hardware validation.
 from dream_gpu_driver import DreamGpuDevice
 
 gpu = DreamGpuDevice(board_transport)
-gpu.load_program([0x90000007, 0x20000001, 0x70000000])
+gpu.reset()  # clear prior program, data and lane state\ngpu.load_program([0x90000007, 0x20000001, 0x70000000])
 for lane, value in enumerate((10, 20, 30, 40)):
     gpu.write_private_word(lane, 7, value)
 gpu.start()
@@ -45,3 +45,8 @@ Run unit tests from the repository root:
 ```sh
 python -m unittest discover -s verification/software -v
 ```
+
+
+## v1.6 INT8 tensor operation
+
+The host driver exposes `run_int8_matmul(a, b, max_polls=10000)`. Both inputs must be 4x4 matrices of signed INT8 values (-128..127); the return value is a 4x4 matrix of signed INT32 values. The hardware register map is documented in `architecture/v1_6_tensor_unit.md`.

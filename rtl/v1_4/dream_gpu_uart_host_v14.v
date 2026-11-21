@@ -150,7 +150,7 @@ module dream_gpu_uart_host_v14 #(
     wire [31:0] host_rdata;
     wire host_ready, host_error;
 
-    dream_gpu_host_v12 #(.WATCHDOG_LIMIT(WATCHDOG_LIMIT)) host(
+    dream_gpu_host_v16 #(.WATCHDOG_LIMIT(WATCHDOG_LIMIT)) host(
         .clk(clk),.reset(reset),
         .host_valid(host_valid),.host_write(host_write),
         .host_addr(host_addr),.host_wdata(host_wdata),

@@ -13,7 +13,8 @@ An experimental four-lane integer processor and host-integration project impleme
 - **v1.2** — memory-mapped host interface for instruction/data loading, start/stop, status, counters, PCs and accumulators.
 - **v1.3** — portable Python host driver with a transport abstraction.
 - **v1.4** — UART serial bridge and Python UART transport; end-to-end RTL serial simulation passes.
-- **v1.5** — board-neutral FPGA top-level with reset synchronizer, plus local HTTP runtime gateway with input validation, optional bearer-token authentication, serialized device access, bounded execution polling, and API tests; host soft reset enables clean repeated jobs.\n- **v1.6** — 4x4 signed INT8 matrix-multiply unit, host registers, Python driver, runtime API endpoint, and signed arithmetic testbench.
+- **v1.5** — board-neutral FPGA top-level with reset synchronizer, plus local HTTP runtime gateway with input validation, optional bearer-token authentication, serialized device access, bounded execution polling, and API tests; host soft reset enables clean repeated jobs.
+- **v1.6** — 4x4 signed INT8 matrix-multiply unit, host registers, Python driver, runtime API endpoint, and signed arithmetic testbench.
 
 GitHub Actions runs inherited processor regressions, host-driver/API tests, UART integration simulation, INT8 tensor tests, and Yosys synthesis/structural checks. See the Actions tab for the current branch's exact run status.
 
@@ -81,7 +82,8 @@ python software/host/dream_gpu_runtime.py --serial-port /dev/ttyUSB0 --baudrate 
 The API listens on `127.0.0.1:8765` by default. A non-loopback bind requires a bearer token of at least 24 characters. Use a TLS reverse proxy and firewall for any remote deployment; the built-in server does not provide TLS.
 
 - `GET /health` — checks register-level device responsiveness and reports capabilities.
-- `POST /v1/execute` — loads raw 32-bit instruction words, optionally preloads four lane-private memory banks, starts execution, and returns lane results.\n- `POST /v1/matmul/int8` — computes a 4x4 signed INT8 matrix product and returns signed INT32 outputs.
+- `POST /v1/execute` — loads raw 32-bit instruction words, optionally preloads four lane-private memory banks, starts execution, and returns lane results.
+- `POST /v1/matmul/int8` — computes a 4x4 signed INT8 matrix product and returns signed INT32 outputs.
 
 ## Release archives
 

@@ -90,6 +90,41 @@ module tb_dream_gpu_v10_maci;
             $fatal(1, "FAIL: signed MACI results %0d %0d %0d %0d",
                 accum_bus[31:0], accum_bus[63:32], accum_bus[95:64], accum_bus[127:96]);
         $display("PASS: signed MACI negative operands = 6, 6, 6, 6");
+
+        // Positive memory value multiplied by negative immediate.
+        reset_engine();
+        load_instruction(0, 32'h10000002); // MOVI +2
+        load_instruction(1, 32'hA0000004); // ST private offset 4
+        load_instruction(2, 32'h10000000); // MOVI 0
+        load_instruction(3, 32'hB03FFF44); // MACI -3
+        load_instruction(4, 32'h70000000); // HALT
+        run_enable = 1;
+        repeat (100) @(negedge clk);
+        if (!done || safety_fault) $fatal(1, "FAIL: positive-negative MACI execution/fault");
+        if (accum_bus[31:0] !== -32'sd6 ||
+            accum_bus[63:32] !== -32'sd6 ||
+            accum_bus[95:64] !== -32'sd6 ||
+            accum_bus[127:96] !== -32'sd6)
+            $fatal(1, "FAIL: positive-negative MACI results");
+        $display("PASS: positive x negative MACI = -6 on all lanes");
+
+        // Negative memory value multiplied by positive immediate.
+        reset_engine();
+        load_instruction(0, 32'h1000FFFE); // MOVI -2
+        load_instruction(1, 32'hA0000004); // ST private offset 4
+        load_instruction(2, 32'h10000000); // MOVI 0
+        load_instruction(3, 32'hB00000C4); // MACI +3
+        load_instruction(4, 32'h70000000); // HALT
+        run_enable = 1;
+        repeat (100) @(negedge clk);
+        if (!done || safety_fault) $fatal(1, "FAIL: negative-positive MACI execution/fault");
+        if (accum_bus[31:0] !== -32'sd6 ||
+            accum_bus[63:32] !== -32'sd6 ||
+            accum_bus[95:64] !== -32'sd6 ||
+            accum_bus[127:96] !== -32'sd6)
+            $fatal(1, "FAIL: negative-positive MACI results");
+        $display("PASS: negative x positive MACI = -6 on all lanes");
+
         $display("DREAM GPU v1.0 SIGNED MACI TEST PASS");
         $finish;
     end

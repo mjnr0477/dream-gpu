@@ -45,6 +45,10 @@ class DreamGpuDriverTests(unittest.TestCase):
         ])
         self.assertEqual(self.gpu.read_private_word(3, 7), 0xAABBCCDD)
 
+    def test_soft_reset_register_sequence(self):
+        self.gpu.reset()
+        self.assertEqual(self.bus.writes, [(0x00, 2), (0x00, 0)])
+
     def test_status_decode_and_wait(self):
         self.bus.registers[0x04] = 0x7C
         state = self.gpu.wait_done(max_polls=1)

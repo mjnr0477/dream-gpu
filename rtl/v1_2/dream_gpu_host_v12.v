@@ -15,7 +15,7 @@ module dream_gpu_host_v12 #(
     output wire busy, done, safety_fault,
     output wire [3:0] halted_mask
 );
-    reg run_enable;
+    reg run_enable;\n    reg engine_soft_reset;\n    wire engine_reset = reset | engine_soft_reset;
     reg [7:0] imem_address_reg;
     reg [31:0] imem_data_reg;
     reg [7:0] dmem_address_reg;
@@ -36,7 +36,7 @@ module dream_gpu_host_v12 #(
     assign busy=run_enable && !done && !safety_fault;
 
     dream_gpu_engine_v12 #(.WATCHDOG_LIMIT(WATCHDOG_LIMIT)) engine(
-      .clk(clk),.reset(reset),.run_enable(run_enable),
+      .clk(clk),.reset(engine_reset),.run_enable(run_enable),
       .imem_write(imem_write),.imem_address(imem_address_reg),
       .imem_data(imem_data_reg),
       .host_dmem_we(dmem_write),.host_dmem_lane(dmem_lane),
@@ -50,14 +50,14 @@ module dream_gpu_host_v12 #(
 
     always @(posedge clk or posedge reset) begin
       if(reset) begin
-        run_enable<=0;
+        run_enable<=0;\n        engine_soft_reset<=0;
         imem_address_reg<=0;
         imem_data_reg<=0;
         dmem_address_reg<=0;
         dmem_data_reg<=0;
-      end else if(host_valid && host_write) begin
+      end else begin\n        engine_soft_reset<=0;\n        if(host_valid && host_write) begin
         case(host_addr)
-          8'h00: run_enable<=host_wdata[0];
+          8'h00: begin run_enable<=host_wdata[0]; engine_soft_reset<=host_wdata[1]; end
           8'h20: imem_address_reg<=host_wdata[7:0];
           8'h24: imem_data_reg<=host_wdata;
           8'h30: dmem_address_reg<=host_wdata[7:0];
@@ -70,7 +70,7 @@ module dream_gpu_host_v12 #(
     always @* begin
       host_rdata=0;
       case(host_addr)
-        8'h00: host_rdata={31'b0,run_enable};
+        8'h00: host_rdata={30'b0,engine_soft_reset,run_enable};
         8'h04: host_rdata={24'b0,safety_fault,done,halted_mask,2'b0};
         8'h08: host_rdata={28'b0,fault_code};
         8'h0C: host_rdata=cycle_count;

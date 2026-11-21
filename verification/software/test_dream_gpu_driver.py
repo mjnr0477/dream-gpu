@@ -59,7 +59,7 @@ class DreamGpuDriverTests(unittest.TestCase):
         result = self.gpu.run_int8_matmul(matrix, identity)
         self.assertEqual(result, tuple(tuple(matrix[r][c] for c in range(4)) for r in range(4)))
         self.assertIn((0x90, 0x04030201), self.bus.writes)
-        self.assertIn((0xA4, 0x00000001), self.bus.writes)
+        self.assertIn((0xA4, 0x00000100), self.bus.writes)
         self.assertIn((0x80, 1), self.bus.writes)
 
     def test_int8_tensor_bounds(self):

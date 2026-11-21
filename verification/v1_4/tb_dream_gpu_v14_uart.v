@@ -10,10 +10,7 @@ module tb_dream_gpu_v14_uart;
     integer i;
 
     always #5 clk=~clk;
-    always @(dut.state) $display("STATE -> %0d tx_busy=%b tx_start=%b tx=%b",dut.state,dut.tx_busy,dut.tx_start,uart_tx);
     always @(posedge clk) begin
-        if (dut.rx_valid) $display("RX byte=%02x parser_state=%0d",dut.rx_data,dut.state);
-        if (dut.state==8) $display("HOST EXECUTE write=%0d addr=%02x data=%08x",dut.is_write,dut.address,dut.write_data);
     end
 
     dream_gpu_uart_host_v14 #(.CLKS_PER_BIT(CLKS_PER_BIT)) dut(
@@ -60,7 +57,6 @@ module tb_dream_gpu_v14_uart;
     task write_register(input [7:0] address,input [31:0] value);
     reg [7:0] status;
     begin
-        $display("SEND WRITE addr=%02x value=%08x",address,value);
         send_byte(8'hD5); send_byte(8'hA5);
         send_byte(8'h02); send_byte(address);
         send_byte(value[7:0]); send_byte(value[15:8]);
@@ -73,7 +69,6 @@ module tb_dream_gpu_v14_uart;
     task read_register(input [7:0] address,output [31:0] value);
     reg [7:0] status,b0,b1,b2,b3;
     begin
-        $display("SEND READ addr=%02x",address);
         send_byte(8'hD5); send_byte(8'hA5);
         send_byte(8'h01); send_last_byte(address);
         receive_byte(status);

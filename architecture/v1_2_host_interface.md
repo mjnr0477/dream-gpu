@@ -10,7 +10,7 @@ A transaction is accepted on a rising edge when `host_valid` is high. `host_read
 
 | Address | Name | Access | Meaning |
 |---|---|---|---|
-| 0x00 | CONTROL | R/W | bit 0 starts (1) or stops (0) lane execution |
+| 0x00 | CONTROL | R/W | bit 0 starts/stops execution; writing bit 1 pulses a self-clearing engine soft reset |
 | 0x04 | STATUS | R | bit 7 fault, bit 6 done, bits 5:2 lane halted mask |
 | 0x08 | FAULT | R | selected fault code |
 | 0x0C | CYCLES | R | maximum lane cycle count |
@@ -37,7 +37,7 @@ Instruction memory has 256 words. Each of the four lanes has a 64-word private d
 5. Write 1 to 0x00 to start execution.
 6. Poll 0x04 until done or fault, then read accumulators/counters.
 
-The external reset pin resets the processor and host staging registers. The bus currently has no interrupt, DMA, burst support, privilege isolation, or formal standard such as AXI4-Lite.
+The external reset pin resets the processor and host staging registers. CONTROL bit 1 provides a one-cycle engine soft reset; it clears instruction memory, private memories, lane state, and counters while preserving host staging registers. The bus currently has no interrupt, DMA, burst support, privilege isolation, or formal standard such as AXI4-Lite.
 
 ## Verification
 

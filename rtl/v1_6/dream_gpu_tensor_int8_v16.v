@@ -1,8 +1,9 @@
 `timescale 1ns/1ps
 
-// Small 4x4 signed INT8 matrix-multiply unit.
-// Matrices are supplied as four packed rows (byte 0 is column 0).
-// One output row is committed per clock: four rows total.
+// Resource-conscious 4x4 signed INT8 matrix multiply.
+// Only one output row is active at a time: 16 signed 8x8 multipliers compute
+// four dot products in parallel, and four output rows are committed over
+// four compute clocks. Each matrix row is packed with column 0 in byte 0.
 module dream_gpu_tensor_int8_v16(
     input wire clk,
     input wire reset,
@@ -21,23 +22,21 @@ module dream_gpu_tensor_int8_v16(
     reg [31:0] matrix_c [0:15];
     reg [1:0] active_row;
 
-    wire signed [15:0] product [0:63];
-    wire signed [31:0] dot [0:15];
-    genvar r,c,k;
+    wire signed [15:0] product [0:15];
+    wire signed [31:0] dot [0:3];
+    genvar c,k;
     generate
-      for (r=0;r<4;r=r+1) begin: ROW
-        for (c=0;c<4;c=c+1) begin: COL
-          for (k=0;k<4;k=k+1) begin: MUL
-            assign product[r*16+c*4+k] =
-              $signed(matrix_a[r][k*8 +: 8]) *
-              $signed(matrix_b[k][c*8 +: 8]);
-          end
-          assign dot[r*4+c] =
-              {{16{product[r*16+c*4+0][15]}},product[r*16+c*4+0]} +
-              {{16{product[r*16+c*4+1][15]}},product[r*16+c*4+1]} +
-              {{16{product[r*16+c*4+2][15]}},product[r*16+c*4+2]} +
-              {{16{product[r*16+c*4+3][15]}},product[r*16+c*4+3]};
+      for (c=0;c<4;c=c+1) begin: COL
+        for (k=0;k<4;k=k+1) begin: MUL
+          assign product[c*4+k] =
+            $signed(matrix_a[active_row][k*8 +: 8]) *
+            $signed(matrix_b[k][c*8 +: 8]);
         end
+        assign dot[c] =
+            {{16{product[c*4+0][15]}},product[c*4+0]} +
+            {{16{product[c*4+1][15]}},product[c*4+1]} +
+            {{16{product[c*4+2][15]}},product[c*4+2]} +
+            {{16{product[c*4+3][15]}},product[c*4+3]};
       end
     endgenerate
 
@@ -66,10 +65,10 @@ module dream_gpu_tensor_int8_v16(
           done <= 0;
           active_row <= 0;
         end else if (busy) begin
-          matrix_c[active_row*4+0] <= dot[active_row*4+0];
-          matrix_c[active_row*4+1] <= dot[active_row*4+1];
-          matrix_c[active_row*4+2] <= dot[active_row*4+2];
-          matrix_c[active_row*4+3] <= dot[active_row*4+3];
+          matrix_c[active_row*4+0] <= dot[0];
+          matrix_c[active_row*4+1] <= dot[1];
+          matrix_c[active_row*4+2] <= dot[2];
+          matrix_c[active_row*4+3] <= dot[3];
           if (active_row==3) begin
             busy <= 0;
             done <= 1;

@@ -7,6 +7,13 @@ on:
     branches: [main]
 
 jobs:
+  python-host-driver:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test portable host driver
+        run: python -m unittest discover -s verification/software -v
+
   iverilog:
     runs-on: ubuntu-latest
     steps:

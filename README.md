@@ -71,6 +71,7 @@ vvp /tmp/dream_gpu_v14.vvp
 - `software/host/dream_gpu_driver.py` — transport-independent register-level device API.
 - `software/host/dream_gpu_uart.py` — UART transport for a serial device; requires `pyserial`.
 - `software/host/dream_gpu_runtime.py` — loopback-first HTTP runtime API; see `architecture/v1_5_runtime_api.md`.
+- `software/host/dream_gpu_client.py` — application-facing HTTP client; see `architecture/v1_6_application_client.md`.
 
 Start the runtime after connecting a compatible FPGA board:
 
@@ -99,5 +100,3 @@ The v0.9 verified archive must remain unchanged.
 ## License
 
 No license has been declared. Public availability does not automatically grant permission to reuse the code.
-
-- **v1.6** — 4x4 signed INT8 matrix multiply unit, memory-mapped host registers, signed arithmetic verification, and a Python driver/API operation.

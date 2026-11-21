@@ -163,6 +163,7 @@ class DreamGpuDevice:
             raise ValueError("matrix_b must be a 4x4 matrix")
         packed_a = tuple(self._pack_int8_row(row) for row in matrix_a)
         packed_b = tuple(self._pack_int8_row(row) for row in matrix_b)
+        self.reset()
         for row, value in enumerate(packed_a):
             self.write_register(self.TENSOR_A_BASE + row * 4, value)
         for row, value in enumerate(packed_b):

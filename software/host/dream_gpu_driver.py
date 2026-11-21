@@ -49,7 +49,8 @@ class DreamGpuDevice:
     DMEM_COMMIT = 0x38
     DMEM_READ = 0x3C
     ACCUMULATORS = (0x40, 0x44, 0x48, 0x4C)
-    PROGRAM_COUNTERS = (0x50, 0x54, 0x58, 0x5C)\n    TENSOR_CONTROL = 0x80\n    TENSOR_STATUS = 0x84\n    TENSOR_A_BASE = 0x90\n    TENSOR_B_BASE = 0xA0\n    TENSOR_C_BASE = 0xB0
+    PROGRAM_COUNTERS = (0x50, 0x54, 0x58, 0x5C)
+    TENSOR_CONTROL = 0x80\n    TENSOR_STATUS = 0x84\n    TENSOR_A_BASE = 0x90\n    TENSOR_B_BASE = 0xA0\n    TENSOR_C_BASE = 0xB0
 
     def __init__(self, transport: DreamGpuTransport):
         self.transport = transport

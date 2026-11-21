@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 
-// Simple synchronous memory-mapped host interface for the DREAM GPU v1.2 RTL.
-// A host transaction is accepted on a rising edge when host_valid is high.
+// Memory-mapped host interface for DREAM GPU. CONTROL bit 1 is a
+// self-clearing soft-reset pulse that clears engine state and memories.
 module dream_gpu_host_v12 #(
     parameter WATCHDOG_LIMIT=100000
 )(
@@ -15,7 +15,9 @@ module dream_gpu_host_v12 #(
     output wire busy, done, safety_fault,
     output wire [3:0] halted_mask
 );
-    reg run_enable;\n    reg engine_soft_reset;\n    wire engine_reset = reset | engine_soft_reset;
+    reg run_enable;
+    reg engine_soft_reset;
+    wire engine_reset = reset | engine_soft_reset;
     reg [7:0] imem_address_reg;
     reg [31:0] imem_data_reg;
     reg [7:0] dmem_address_reg;
@@ -49,27 +51,34 @@ module dream_gpu_host_v12 #(
     );
 
     always @(posedge clk or posedge reset) begin
-      if(reset) begin
-        run_enable<=0;\n        engine_soft_reset<=0;
+      if (reset) begin
+        run_enable<=0;
+        engine_soft_reset<=0;
         imem_address_reg<=0;
         imem_data_reg<=0;
         dmem_address_reg<=0;
         dmem_data_reg<=0;
-      end else begin\n        engine_soft_reset<=0;\n        if(host_valid && host_write) begin
-        case(host_addr)
-          8'h00: begin run_enable<=host_wdata[0]; engine_soft_reset<=host_wdata[1]; end
-          8'h20: imem_address_reg<=host_wdata[7:0];
-          8'h24: imem_data_reg<=host_wdata;
-          8'h30: dmem_address_reg<=host_wdata[7:0];
-          8'h34: dmem_data_reg<=host_wdata;
-          default: begin end
-        endcase
+      end else begin
+        engine_soft_reset<=0;
+        if (host_valid && host_write) begin
+          case (host_addr)
+            8'h00: begin
+              run_enable<=host_wdata[0];
+              engine_soft_reset<=host_wdata[1];
+            end
+            8'h20: imem_address_reg<=host_wdata[7:0];
+            8'h24: imem_data_reg<=host_wdata;
+            8'h30: dmem_address_reg<=host_wdata[7:0];
+            8'h34: dmem_data_reg<=host_wdata;
+            default: begin end
+          endcase
+        end
       end
     end
 
     always @* begin
       host_rdata=0;
-      case(host_addr)
+      case (host_addr)
         8'h00: host_rdata={30'b0,engine_soft_reset,run_enable};
         8'h04: host_rdata={24'b0,safety_fault,done,halted_mask,2'b0};
         8'h08: host_rdata={28'b0,fault_code};

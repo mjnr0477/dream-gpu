@@ -59,6 +59,30 @@ module tb_dream_gpu_v11_parallel;
       $fatal(1,"FAIL: expected 3 clocks / 12 total lane instructions");
     $display("PASS: four independent lanes completed in 3 clocks (12 lane instructions)");
 
+    // Divergent control flow: lane 0 takes BRZ; lanes 1-3 take the fall-through path.
+    clear_and_reset;
+    load(0,32'h80000000); // LID: lane 0 gets zero, others nonzero
+    load(1,32'h50000003); // BRZ +3: lane 0 -> 5, others -> 2
+    load(2,32'h2000000A); // ADDI 10
+    load(3,32'h20000005); // ADDI 5
+    load(4,32'h60000006); // JMP 6
+    load(5,32'h70000000); // HALT lane 0
+    load(6,32'h70000000); // HALT lanes 1-3
+    run_enable=1;
+    wait(halted_mask[0]); #1;
+    if(halted_mask[3:1]!==3'b000)
+      $fatal(1,"FAIL: divergent lanes halted before their own paths completed");
+    $display("PASS: lane 0 halted independently while lanes 1-3 continued");
+    wait(done); #1;
+    if(safety_fault) $fatal(1,"FAIL: divergent branch caused safety fault");
+    if(accum_bus[31:0]!==0 || accum_bus[63:32]!==15 ||
+       accum_bus[95:64]!==15 || accum_bus[127:96]!==15)
+      $fatal(1,"FAIL: divergent per-lane results incorrect");
+    if(cycle_count!==32'd6 || instruction_count!==32'd21 ||
+       branch_count!==32'd4)
+      $fatal(1,"FAIL: divergent per-lane counters incorrect");
+    $display("PASS: independent branch paths and lane halt verified");
+
     // Verify lane-private memory and MACI in the parallel engine.
     clear_and_reset;
     load(0,32'h80000000); // LID

@@ -45,3 +45,8 @@ Run unit tests from the repository root:
 ```sh
 python -m unittest discover -s verification/software -v
 ```
+
+
+## v1.6 INT8 tensor operation
+
+The host driver exposes `run_int8_matmul(a, b, max_polls=10000)`. Both inputs must be 4x4 matrices of signed INT8 values (-128..127); the return value is a 4x4 matrix of signed INT32 values. The hardware register map is documented in `architecture/v1_6_tensor_unit.md`.

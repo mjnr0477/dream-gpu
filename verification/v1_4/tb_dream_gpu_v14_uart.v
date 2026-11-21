@@ -10,6 +10,7 @@ module tb_dream_gpu_v14_uart;
     integer i;
 
     always #5 clk=~clk;
+    always @(dut.state) $display("STATE -> %0d tx_busy=%b tx_start=%b tx=%b",dut.state,dut.tx_busy,dut.tx_start,uart_tx);
     always @(posedge clk) begin
         if (dut.rx_valid) $display("RX byte=%02x parser_state=%0d",dut.rx_data,dut.state);
         if (dut.state==8) $display("HOST EXECUTE write=%0d addr=%02x data=%08x",dut.is_write,dut.address,dut.write_data);

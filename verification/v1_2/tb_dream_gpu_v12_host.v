@@ -53,6 +53,12 @@ module tb_dream_gpu_v12_host;
     repeat(3) @(negedge clk); reset=0;
     if(!host_ready && host_valid) $fatal(1,"FAIL: host interface not ready");
 
+    // Soft reset must clear stale execution state and private memory.
+    load_private_word(3,7,99);
+    write_reg(8'h00,32'd2);
+    repeat(2) @(negedge clk);
+    read_check(8'h3C,32'd0);
+
     // Load a lane-private data value through the host bus for every lane.
     load_private_word(0,7,10);
     load_private_word(1,7,20);
@@ -76,6 +82,7 @@ module tb_dream_gpu_v12_host;
     read_check(8'h0C,3);
     read_check(8'h10,12);
     read_check(8'h04,32'h0000007C);
+    $display("PASS: host soft reset clears stale state and memories");
     $display("PASS: host loaded shared instructions");
     $display("PASS: host wrote and read lane-private memory");
     $display("PASS: host launched program and read four lane results");

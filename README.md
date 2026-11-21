@@ -9,6 +9,7 @@ An experimental four-lane GPU-style processor implemented in Verilog RTL.
 - v0.8: Lane-private memory — verified.
 - v0.9: Reliability and fault protection — verified.
 - v1.0: Candidate with signed MACI multiply-accumulate instruction; regression and synthesis checks run in GitHub Actions.
+- v1.1: Four independent lane execution units with simultaneous instruction issue; parallel execution and private-memory MACI tests are in GitHub Actions.
 
 DREAM GPU is currently a simulated RTL design, not a physical GPU, FPGA bitstream, or fabricated ASIC.
 
@@ -16,6 +17,7 @@ DREAM GPU is currently a simulated RTL design, not a physical GPU, FPGA bitstrea
 
 - rtl/ — processor RTL
 - rtl/v1_0/ — v1.0 candidate
+- rtl/v1_1/ — four-lane parallel execution prototype
 - verification/ — testbenches
 - verification/v1_0/ — v1.0 regression tests
 - releases/ — versioned archives and SHA-256 checksums
@@ -64,3 +66,11 @@ This project does not claim commercial GPU compatibility or physical GPU perform
 ## License
 
 No license has been declared. Public availability does not automatically grant permission to reuse the code.
+
+## Run v1.1 four-lane parallel test
+
+    iverilog -g2012 -s tb_dream_gpu_v11_parallel -o /tmp/dream_gpu_v11.vvp rtl/v1_1/dream_gpu_lane_v11.v rtl/v1_1/dream_gpu_engine_v11.v verification/v1_1/tb_dream_gpu_v11_parallel.v
+    vvp /tmp/dream_gpu_v11.vvp
+
+The v1.1 test checks that all four lane PCs advance on the same clock edge, complete 12 lane-instructions in 3 clocks, and use separate private-memory banks for MACI. See architecture/v1_1_parallel_architecture.md.
+

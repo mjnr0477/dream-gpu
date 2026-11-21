@@ -27,6 +27,8 @@ class RuntimeFakeTransport:
         self.regs[address] = value
         if address == 0x00 and value == 1:
             self.regs[0x04] = 0x7C
+        if address == 0x80 and value == 1:
+            self.regs[0x84] = 1
         if address == 0x38:
             self.regs[0x3C] = self.regs.get(0x34, 0)
 
@@ -75,6 +77,26 @@ class RuntimeApiTests(unittest.TestCase):
         self.assertIn((0x00, 2), self.transport.writes)
         self.assertIn((0x20, 0), self.transport.writes)
         self.assertIn((0x00, 1), self.transport.writes)
+
+    def test_int8_matmul_endpoint(self):
+        expected = [1, 4, 3, 4, 5, 16, 7, 8, 9, 28, 11, 12, 13, 40, 15, 16]
+        for index, value in enumerate(expected):
+            self.transport.regs[0xB0 + index * 4] = value
+        matrix_a = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]
+        matrix_b = [[1, 2, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
+        status, payload = self.request("POST", "/v1/matmul/int8", {"a": matrix_a, "b": matrix_b})
+        self.assertEqual(status, 200)
+        self.assertEqual(payload["dtype"], "int32")
+        self.assertEqual(payload["matrix"], [
+            [1, 4, 3, 4], [5, 16, 7, 8], [9, 28, 11, 12], [13, 40, 15, 16]
+        ])
+
+    def test_int8_matmul_rejects_out_of_range_values(self):
+        status, payload = self.request("POST", "/v1/matmul/int8", {
+            "a": [[128, 0, 0, 0]] * 4, "b": [[1, 0, 0, 0]] * 4
+        })
+        self.assertEqual(status, 400)
+        self.assertEqual(payload["error"], "invalid_request")
 
     def test_authentication_required(self):
         status, payload = self.request("GET", "/health", token="wrong")

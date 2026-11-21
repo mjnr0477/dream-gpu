@@ -60,7 +60,17 @@ class DreamGpuDriverTests(unittest.TestCase):
         self.assertEqual(result, tuple(tuple(matrix[r][c] for c in range(4)) for r in range(4)))
         self.assertIn((0x90, 0x04030201), self.bus.writes)
         self.assertIn((0xA4, 0x00000100), self.bus.writes)
+        self.assertIn((0x00, 2), self.bus.writes)
         self.assertIn((0x80, 1), self.bus.writes)
+
+    def test_int8_tensor_signed_result_readback(self):
+        self.bus.registers[0x84] = 1
+        self.bus.registers[0xB0] = 0xFFFFFFF8
+        self.bus.registers[0xB4] = 0xFFFFFFF1
+        matrix_a = [[-2, 3, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+        matrix_b = [[4, 0, 0, 0], [0, -5, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+        result = self.gpu.run_int8_matmul(matrix_a, matrix_b)
+        self.assertEqual(result[0][:2], (-8, -15))
 
     def test_int8_tensor_bounds(self):
         with self.assertRaises(ValueError):

@@ -13,7 +13,7 @@ An experimental four-lane integer processor and host-integration project impleme
 - **v1.2** — memory-mapped host interface for instruction/data loading, start/stop, status, counters, PCs and accumulators.
 - **v1.3** — portable Python host driver with a transport abstraction.
 - **v1.4** — UART serial bridge and Python UART transport; end-to-end RTL serial simulation passes.
-- **v1.5** — local HTTP runtime gateway with input validation, optional bearer-token authentication, serialized device access, bounded execution polling, and API tests.
+- **v1.5** — board-neutral FPGA top-level with reset synchronizer, plus local HTTP runtime gateway with input validation, optional bearer-token authentication, serialized device access, bounded execution polling, and API tests.
 
 GitHub Actions runs inherited processor regressions, host-driver/API tests, UART integration simulation, and Yosys synthesis/structural checks. See the Actions tab for the current branch's exact run status.
 

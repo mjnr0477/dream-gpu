@@ -61,26 +61,26 @@ class DreamGpuDevice:
 
     @staticmethod
     def _u32(value: int) -> int:
-        if not isinstance(value, int) or not 0 <= value <= 0xFFFFFFFF:
+        if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= 0xFFFFFFFF:
             raise ValueError("register values must be unsigned 32-bit integers")
         return value
 
     @staticmethod
     def _lane_offset(lane: int, offset: int) -> int:
-        if lane not in range(4):
+        if isinstance(lane, bool) or not isinstance(lane, int) or lane not in range(4):
             raise ValueError("lane must be in range 0..3")
-        if offset not in range(64):
+        if isinstance(offset, bool) or not isinstance(offset, int) or offset not in range(64):
             raise ValueError("private-memory offset must be in range 0..63")
         return (lane << 6) | offset
 
     @staticmethod
     def _instruction_index(index: int) -> int:
-        if index not in range(256):
+        if isinstance(index, bool) or not isinstance(index, int) or index not in range(256):
             raise ValueError("instruction index must be in range 0..255")
         return index
 
     def read_register(self, address: int) -> int:
-        if address not in range(0, 256, 4):
+        if isinstance(address, bool) or not isinstance(address, int) or address not in range(0, 256, 4):
             raise ValueError("register address must be 32-bit aligned and within 0x00..0xFC")
         return self._u32(self.transport.read32(address))
 
@@ -91,7 +91,7 @@ class DreamGpuDevice:
 
     def load_program(self, words: Iterable[int], start_index: int = 0) -> int:
         program = tuple(self._u32(word) for word in words)
-        if start_index not in range(256) or start_index + len(program) > 256:
+        if isinstance(start_index, bool) or not isinstance(start_index, int) or start_index not in range(256) or start_index + len(program) > 256:
             raise ValueError("program must fit in the 256-word instruction memory")
         for index, word in enumerate(program, start_index):
             self.write_register(self.IMEM_ADDR, index)

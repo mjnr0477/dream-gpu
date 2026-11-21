@@ -22,7 +22,7 @@ module dream_gpu_host_v16 #(
     wire [31:0] base_rdata;
     wire base_ready,base_error;
     wire tensor_reset = reset || (host_valid && host_write &&
-                                  host_addr==8'h00 && host_wdata[1]);
+                                  ((host_addr==8'h00 || host_addr==8'h80) && host_wdata[1]));
     wire tensor_start = host_valid && host_write &&
                         host_addr==8'h80 && host_wdata[0];
     wire tensor_write_a = host_valid && host_write &&

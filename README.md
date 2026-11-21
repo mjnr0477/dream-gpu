@@ -97,3 +97,5 @@ The v0.9 verified archive must remain unchanged.
 ## License
 
 No license has been declared. Public availability does not automatically grant permission to reuse the code.
+
+- **v1.6** — 4x4 signed INT8 matrix multiply unit, memory-mapped host registers, signed arithmetic verification, and a Python driver/API operation.

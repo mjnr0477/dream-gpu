@@ -45,3 +45,4 @@ jobs:
       - name: Synthesis and structural checks
         run: |
           yosys -p 'read_verilog rtl/v1_0/dream_gpu_core_v10.v rtl/v1_0/dream_gpu_engine_v10.v; hierarchy -check -top dream_gpu_engine_v10; proc; check; synth -top dream_gpu_engine_v10; stat'
+          yosys -p 'read_verilog rtl/v1_1/dream_gpu_lane_v11.v rtl/v1_1/dream_gpu_engine_v11.v; hierarchy -check -top dream_gpu_engine_v11; proc; check; synth -top dream_gpu_engine_v11; stat'

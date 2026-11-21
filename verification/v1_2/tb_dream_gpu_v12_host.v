@@ -75,7 +75,7 @@ module tb_dream_gpu_v12_host;
     read_check(8'h4C,41);
     read_check(8'h0C,3);
     read_check(8'h10,12);
-    read_check(8'h04,32'h0000003C);
+    read_check(8'h04,32'h0000007C);
     $display("PASS: host loaded shared instructions");
     $display("PASS: host wrote and read lane-private memory");
     $display("PASS: host launched program and read four lane results");

@@ -55,6 +55,24 @@ module tb_dream_gpu_v16_tensor;
       expected[12]=13; expected[13]=40; expected[14]=15; expected[15]=16;
       for(i=0;i<16;i=i+1)
         read_check(8'hB0+i*4,expected[i]);
+
+      // A soft reset also clears the tensor input/output banks.
+      write_reg(8'h00,32'd2);
+      write_reg(8'h90,32'h000003FE); // [-2, 3, 0, 0]
+      write_reg(8'h94,32'h00000000);
+      write_reg(8'h98,32'h00000000);
+      write_reg(8'h9C,32'h00000000);
+      write_reg(8'hA0,32'h00000004); // [4, 0, 0, 0]
+      write_reg(8'hA4,32'h0000FB00); // [0, -5, 0, 0]
+      write_reg(8'hA8,32'h00000000);
+      write_reg(8'hAC,32'h00000000);
+      write_reg(8'h80,32'd1);
+      wait(dut.tensor_done); #1;
+      read_check(8'hB0,32'hFFFFFFF8); // -8
+      read_check(8'hB4,32'hFFFFFFF1); // -15
+      read_check(8'hB8,32'd0);
+      read_check(8'hBC,32'd0);
+      $display("PASS: signed negative INT8 products and soft reset");
       $display("PASS: 4x4 INT8 matrix multiply outputs");
       $display("DREAM GPU v1.6 INT8 TENSOR TEST PASS");
       $finish;

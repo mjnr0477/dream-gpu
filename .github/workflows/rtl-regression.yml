@@ -35,6 +35,13 @@ jobs:
           run_test reliability verification/v1_0/tb_dream_gpu_v10_reliability.v "DREAM GPU v0.9 RELIABILITY TESTS PASS"
           run_test maci verification/v1_0/tb_dream_gpu_v10_maci.v "DREAM GPU v1.0 SIGNED MACI TEST PASS"
 
+      - name: Run v1.1 four-lane parallel verification
+        run: |
+          set -euo pipefail
+          iverilog -g2012 -s tb_dream_gpu_v11_parallel -o /tmp/dream_gpu_v11.vvp rtl/v1_1/dream_gpu_lane_v11.v rtl/v1_1/dream_gpu_engine_v11.v verification/v1_1/tb_dream_gpu_v11_parallel.v
+          vvp /tmp/dream_gpu_v11.vvp | tee /tmp/dream_gpu_v11.log
+          grep -F "DREAM GPU v1.1 FOUR-LANE PARALLEL TEST PASS" /tmp/dream_gpu_v11.log
+          ! grep -F "FAIL" /tmp/dream_gpu_v11.log
       - name: Synthesis and structural checks
         run: |
           yosys -p 'read_verilog rtl/v1_0/dream_gpu_core_v10.v rtl/v1_0/dream_gpu_engine_v10.v; hierarchy -check -top dream_gpu_engine_v10; proc; check; synth -top dream_gpu_engine_v10; stat'

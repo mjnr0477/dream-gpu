@@ -12,13 +12,13 @@ for 4x4 matrices. Each output is a signed 32-bit integer. All 16 products for on
 
 | Address | Name | Access | Meaning |
 |---|---|---|---|
-| 0x80 | TENSOR_CONTROL | W | bit 0 starts a matrix operation |
+| 0x80 | TENSOR_CONTROL | W | bit 0 starts; bit 1 pulses a tensor-only soft reset |
 | 0x84 | TENSOR_STATUS | R | bit 0 done, bit 1 busy |
 | 0x90–0x9C | MATRIX_A_ROW[0:3] | W | Four signed INT8 values packed little-endian in each row |
 | 0xA0–0xAC | MATRIX_B_ROW[0:3] | W | Four signed INT8 values packed little-endian in each row |
 | 0xB0–0xEC | MATRIX_C[0:15] | R | Signed INT32 output values in row-major order |
 
-A soft reset through base CONTROL address 0x00 bit 1 clears the tensor's input and output registers as well as the main processor's memories/state.
+A tensor-only reset through 0x80 bit 1 clears tensor input/output state without resetting the processor. A base CONTROL reset through 0x00 bit 1 clears both the processor and tensor unit.
 
 ## Software
 

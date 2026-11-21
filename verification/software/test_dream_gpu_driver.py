@@ -49,6 +49,25 @@ class DreamGpuDriverTests(unittest.TestCase):
         self.gpu.reset()
         self.assertEqual(self.bus.writes, [(0x00, 2), (0x00, 0)])
 
+    def test_int8_tensor_driver_round_trip(self):
+        expected = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+        self.bus.registers[0x84] = 1
+        for index, value in enumerate(expected):
+            self.bus.registers[0xB0 + index * 4] = value
+        matrix = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]
+        identity = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
+        result = self.gpu.run_int8_matmul(matrix, identity)
+        self.assertEqual(result, tuple(tuple(matrix[r][c] for c in range(4)) for r in range(4)))
+        self.assertIn((0x90, 0x04030201), self.bus.writes)
+        self.assertIn((0xA4, 0x00000001), self.bus.writes)
+        self.assertIn((0x80, 1), self.bus.writes)
+
+    def test_int8_tensor_bounds(self):
+        with self.assertRaises(ValueError):
+            self.gpu.run_int8_matmul([[1, 2, 3]], [[1, 2, 3, 4]] * 4)
+        with self.assertRaises(ValueError):
+            self.gpu.run_int8_matmul([[128, 0, 0, 0]] * 4, [[1, 0, 0, 0]] * 4)
+
     def test_status_decode_and_wait(self):
         self.bus.registers[0x04] = 0x7C
         state = self.gpu.wait_done(max_polls=1)

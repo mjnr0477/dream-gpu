@@ -56,8 +56,8 @@ module tb_dream_gpu_v16_tensor;
       for(i=0;i<16;i=i+1)
         read_check(8'hB0+i*4,expected[i]);
 
-      // A soft reset also clears the tensor input/output banks.
-      write_reg(8'h00,32'd2);
+      // Tensor-only soft reset clears tensor state without resetting the CPU lanes.
+      write_reg(8'h80,32'd2);
       write_reg(8'h90,32'h000003FE); // [-2, 3, 0, 0]
       write_reg(8'h94,32'h00000000);
       write_reg(8'h98,32'h00000000);

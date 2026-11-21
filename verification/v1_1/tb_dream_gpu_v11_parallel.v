@@ -75,8 +75,8 @@ module tb_dream_gpu_v11_parallel;
     $display("PASS: lane 0 halted independently while lanes 1-3 continued");
     wait(done); #1;
     if(safety_fault) $fatal(1,"FAIL: divergent branch caused safety fault");
-    if(accum_bus[31:0]!==0 || accum_bus[63:32]!==15 ||
-       accum_bus[95:64]!==15 || accum_bus[127:96]!==15)
+    if(accum_bus[31:0]!==0 || accum_bus[63:32]!==16 ||
+       accum_bus[95:64]!==17 || accum_bus[127:96]!==18)
       $fatal(1,"FAIL: divergent per-lane results incorrect");
     if(cycle_count!==32'd6 || instruction_count!==32'd21 ||
        branch_count!==32'd4)

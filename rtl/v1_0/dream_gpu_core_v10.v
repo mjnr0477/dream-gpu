@@ -37,6 +37,13 @@ module dream_gpu_core_v10 #(
     localparam OP_LID  = 4'h8;
     localparam OP_LD   = 4'h9;
     localparam OP_ST   = 4'hA;
+    localparam OP_MACI = 4'hB;
+
+    wire signed [31:0] mac_operand_a =
+        $signed({{16{mem_read_data[15]}}, mem_read_data[15:0]});
+    wire signed [31:0] mac_operand_b =
+        $signed({{16{instruction[21]}}, instruction[21:6]});
+    wire signed [31:0] mac_product = mac_operand_a * mac_operand_b;
 
     reg [8:0] pc [0:3];
     reg [31:0] accum [0:3];
@@ -143,6 +150,12 @@ module dream_gpu_core_v10 #(
                     end
 
                     OP_ST: begin
+                        pc[lane_id] <= next_pc[8:0];
+                    end
+
+                    // MACI: accum += signed(private_mem[offset]) * signed(immediate)
+                    OP_MACI: begin
+                        accum[lane_id] <= accum[lane_id] + mac_product;
                         pc[lane_id] <= next_pc[8:0];
                     end
 

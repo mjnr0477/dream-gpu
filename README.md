@@ -8,7 +8,7 @@ An experimental four-lane GPU-style processor implemented in Verilog RTL.
 - v0.7: Independent lane execution — verified.
 - v0.8: Lane-private memory — verified.
 - v0.9: Reliability and fault protection — verified.
-- v1.0: Candidate carrying forward the previous regression tests.
+- v1.0: Candidate with signed MACI multiply-accumulate instruction; regression and synthesis checks run in GitHub Actions.
 
 DREAM GPU is currently a simulated RTL design, not a physical GPU, FPGA bitstream, or fabricated ASIC.
 
@@ -45,7 +45,10 @@ From the repository root:
     iverilog -g2012 -o simulation/v1_0/reliability.vvp rtl/v1_0/dream_gpu_core_v10.v rtl/v1_0/dream_gpu_engine_v10.v verification/v1_0/tb_dream_gpu_v10_reliability.v
     vvp simulation/v1_0/reliability.vvp
 
-Check for the corresponding TESTS PASS messages and no FAIL messages.
+    iverilog -g2012 -o simulation/v1_0/maci.vvp rtl/v1_0/dream_gpu_core_v10.v rtl/v1_0/dream_gpu_engine_v10.v verification/v1_0/tb_dream_gpu_v10_maci.v
+    vvp simulation/v1_0/maci.vvp
+
+Check for the corresponding TESTS PASS messages and no FAIL messages. The MACI encoding is documented in architecture/v1_0_instruction_set.md. GitHub Actions also runs a Yosys synthesis and structural check.
 
 ## Verify release archives
 

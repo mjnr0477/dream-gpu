@@ -1,0 +1,40 @@
+name: DREAM GPU RTL regression
+
+on:
+  push:
+    branches: [main, "feature/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  iverilog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Icarus Verilog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iverilog yosys
+      - name: Run inherited regression tests and MACI
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p simulation/ci
+          run_test() {
+            local name="$1" tb="$2" expected="$3"
+            iverilog -g2012 -o "simulation/ci/${name}.vvp" \
+              rtl/v1_0/dream_gpu_core_v10.v \
+              rtl/v1_0/dream_gpu_engine_v10.v "$tb"
+            vvp "simulation/ci/${name}.vvp" | tee "simulation/ci/${name}.log"
+            grep -F "$expected" "simulation/ci/${name}.log"
+            ! grep -F "FAIL" "simulation/ci/${name}.log"
+          }
+          run_test basic verification/v1_0/tb_dream_gpu_v10_basic.v "DREAM GPU v0.6 BASIC TESTS PASS"
+          run_test divergent verification/v1_0/tb_dream_gpu_v10_divergent.v "DREAM GPU v0.7 DIVERGENT TESTS PASS"
+          run_test memory verification/v1_0/tb_dream_gpu_v10_memory.v "DREAM GPU v0.8 MEMORY TESTS PASS"
+          run_test reliability verification/v1_0/tb_dream_gpu_v10_reliability.v "DREAM GPU v0.9 RELIABILITY TESTS PASS"
+          run_test maci verification/v1_0/tb_dream_gpu_v10_maci.v "DREAM GPU v1.0 SIGNED MACI TEST PASS"
+
+      - name: Synthesis and structural checks
+        run: |
+          yosys -p 'read_verilog rtl/v1_0/dream_gpu_core_v10.v rtl/v1_0/dream_gpu_engine_v10.v; hierarchy -check -top dream_gpu_engine_v10; proc; check; synth -top dream_gpu_engine_v10; stat'

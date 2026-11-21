@@ -1,0 +1,17 @@
+VCD info: dumpfile simulation/dream_gpu_v06.vcd opened for output.
+
+DREAM GPU v0.6 VERIFICATION
+===========================
+PASS lane=0 accumulator=12
+PASS lane=1 accumulator=12
+PASS lane=2 accumulator=12
+PASS lane=3 accumulator=12
+PASS: all lanes halted
+PASS: no unexpected safety fault
+PASS: instruction count = 12
+
+Cycles: 12
+Instructions: 12
+Branches: 0
+DREAM GPU v0.6 BASIC TESTS PASS
+verification/v1_0/tb_dream_gpu_v10_basic.v:157: $finish called at 490000 (1ps)

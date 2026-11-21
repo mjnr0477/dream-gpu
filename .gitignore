@@ -2,3 +2,22 @@
 *.vvp
 simulation/**/*.vcd
 simulation/**/*.vvp
+
+# Generated simulation outputs
+simulation/*.vcd
+simulation/*_test
+simulation/mac4_test
+simulation/dream_gpu_v02_test
+simulation/dream_gpu_v03_memory_test
+simulation/dream_gpu_v04_test
+simulation/dream_gpu_v05_test
+simulation/dream_gpu_v06_test
+simulation/dream_gpu_v06_part1
+simulation/dream_gpu_v07_test
+simulation/dream_gpu_v08_test
+simulation/dream_gpu_v09_test
+simulation/v1_0/basic
+simulation/v1_0/divergent
+simulation/v1_0/memory
+simulation/v1_0/reliability
+simulation/v1_0/*.vvp

@@ -1,0 +1,20 @@
+VCD info: dumpfile simulation/dream_gpu_v07.vcd opened for output.
+
+DREAM GPU v0.7 DIVERGENT EXECUTION TEST
+======================================
+PASS: lane 0 halted independently
+PASS: lanes 1-3 continued independently
+PASS: all lanes halted
+PASS lane 0 accumulator=0
+PASS lane 1 accumulator=16
+PASS lane 2 accumulator=17
+PASS lane 3 accumulator=18
+PASS: branch count = 4
+PASS: instruction count = 21
+PASS: no unexpected safety fault
+
+Cycles: 21
+Instructions: 21
+Branches: 4
+DREAM GPU v0.7 DIVERGENT TESTS PASS
+verification/v1_0/tb_dream_gpu_v10_divergent.v:185: $finish called at 380000 (1ps)

@@ -1,0 +1,18 @@
+
+DREAM GPU v0.9 RELIABILITY VERIFICATION
+======================================
+PASS: invalid instruction fault code=4
+PASS: invalid jump target fault code=3
+PASS: out-of-range program counter fault code=2
+PASS: reset clears previous fault
+PASS: all lanes recover and execute
+PASS: recovery accumulators = 11
+PASS: watchdog timeout fault code=1
+
+Main engine cycles: 12
+Main engine instructions: 12
+Main engine branches: 0
+
+DREAM GPU v0.9 RELIABILITY TESTS PASS
+
+verification/v1_0/tb_dream_gpu_v10_reliability.v:216: $finish called at 780000 (1ps)

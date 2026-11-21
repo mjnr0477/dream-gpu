@@ -1,0 +1,24 @@
+
+DREAM GPU v0.8 MEMORY VERIFICATION
+=================================
+PASS: program loaded
+PASS: all lanes halted
+PASS: no unexpected safety fault
+PASS lane 0 accumulator = 11
+PASS lane 1 accumulator = 12
+PASS lane 2 accumulator = 13
+PASS lane 3 accumulator = 14
+PASS: lane 0 private memory = 10
+PASS: lane 1 private memory = 11
+PASS: lane 2 private memory = 12
+PASS: lane 3 private memory = 13
+PASS: instruction count = 28
+PASS: branch count = 0
+
+Cycles: 28
+Instructions: 28
+Branches: 0
+
+DREAM GPU v0.8 MEMORY TESTS PASS
+
+verification/v1_0/tb_dream_gpu_v10_memory.v:159: $finish called at 970000 (1ps)

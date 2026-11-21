@@ -51,3 +51,10 @@ capabilities exist and the board has passed physical tests.
 
 The fake-transport tests validate API behavior and register sequencing only.
 They do not establish that a real FPGA exists or is connected.
+
+
+## INT8 tensor endpoint (v1.6)
+
+- `POST /v1/matmul/int8` accepts two 4x4 matrices named `a` and `b`, with signed INT8 values in the range -128..127.
+- Returns a 4x4 signed INT32 matrix.
+- The v1.6 tensor block computes one output row per clock over four clocks. It is a small fixed-point building block, not a complete neural-network accelerator.

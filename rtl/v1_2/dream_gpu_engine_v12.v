@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 
 // Four independent lanes issue one instruction each on every enabled clock.
-module dream_gpu_engine_v11 #(
+module dream_gpu_engine_v12 #(
     parameter WATCHDOG_LIMIT=100000
 )(
     input wire clk, reset, run_enable,

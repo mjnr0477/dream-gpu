@@ -29,8 +29,8 @@ module dream_gpu_host_v16 #(
                           host_addr>=8'h90 && host_addr<=8'h9C;
     wire tensor_write_b = host_valid && host_write &&
                           host_addr>=8'hA0 && host_addr<=8'hAC;
-    wire [1:0] tensor_row = (host_addr[5:2]);
-    wire [3:0] tensor_result_address = host_addr[5:2];
+    wire [1:0] tensor_row = (host_addr>=8'h90 && host_addr<=8'h9C) ? ((host_addr-8'h90)>>2) : ((host_addr-8'hA0)>>2);
+    wire [3:0] tensor_result_address = (host_addr-8'hB0)>>2;
     wire [31:0] tensor_result_data;
     wire tensor_busy,tensor_done;
     reg [31:0] selected_rdata;

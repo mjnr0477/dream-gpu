@@ -149,7 +149,8 @@ def make_handler(device: DreamGpuDevice, api_token: str | None = None):
                         "private_words_per_lane": 64,
                         "integer_accumulators": 4,
                         "floating_point": False,
-                        "tensor_acceleration": True,\n                        "tensor_unit": "4x4 signed INT8 matrix multiply",
+                        "tensor_acceleration": True,
+                        "tensor_unit": "4x4 signed INT8 matrix multiply",
                         "physical_fpga_verified": False
                     }
                 })

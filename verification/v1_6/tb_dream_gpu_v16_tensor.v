@@ -44,8 +44,8 @@ module tb_dream_gpu_v16_tensor;
       // B rows: [1,2,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1].
       write_reg(8'hA0,32'h00000201);
       write_reg(8'hA4,32'h00000100);
-      write_reg(8'hA8,32'h00000100);
-      write_reg(8'hAC,32'h00000100);
+      write_reg(8'hA8,32'h00010000);
+      write_reg(8'hAC,32'h01000000);
       write_reg(8'h80,1);
       wait(dut.tensor_done); #1;
       read_check(8'h84,32'h1);

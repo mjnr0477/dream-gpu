@@ -10,6 +10,10 @@ module tb_dream_gpu_v14_uart;
     integer i;
 
     always #5 clk=~clk;
+    always @(posedge clk) begin
+        if (dut.rx_valid) $display("RX byte=%02x parser_state=%0d",dut.rx_data,dut.state);
+        if (dut.state==8) $display("HOST EXECUTE write=%0d addr=%02x data=%08x",dut.is_write,dut.address,dut.write_data);
+    end
 
     dream_gpu_uart_host_v14 #(.CLKS_PER_BIT(CLKS_PER_BIT)) dut(
         .clk(clk),.reset(reset),.uart_rx(uart_rx),.uart_tx(uart_tx),
@@ -45,6 +49,7 @@ module tb_dream_gpu_v14_uart;
     task write_register(input [7:0] address,input [31:0] value);
     reg [7:0] status;
     begin
+        $display("SEND WRITE addr=%02x value=%08x",address,value);
         send_byte(8'hD5); send_byte(8'hA5);
         send_byte(8'h02); send_byte(address);
         send_byte(value[7:0]); send_byte(value[15:8]);
@@ -57,6 +62,7 @@ module tb_dream_gpu_v14_uart;
     task read_register(input [7:0] address,output [31:0] value);
     reg [7:0] status,b0,b1,b2,b3;
     begin
+        $display("SEND READ addr=%02x",address);
         send_byte(8'hD5); send_byte(8'hA5);
         send_byte(8'h01); send_byte(address);
         receive_byte(status);
@@ -71,9 +77,9 @@ module tb_dream_gpu_v14_uart;
         repeat(5) @(posedge clk);
         reset=0;
         repeat(5) @(posedge clk);
-        write_register(8'h30,32'h000000C7); // lane 3, private word 7
-        write_register(8'h34,32'h00000028); // value 40
-        write_register(8'h38,32'h00000001); // commit host write
+        write_register(8'h30,32'h000000C7);
+        write_register(8'h34,32'h00000028);
+        write_register(8'h38,32'h00000001);
         read_register(8'h3C,read_value);
         if (read_value!==32'd40)
             $fatal(1,"UART private-memory readback expected 40, got %0d",read_value);

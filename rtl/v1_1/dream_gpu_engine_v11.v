@@ -38,7 +38,7 @@ module dream_gpu_engine_v11 #(
 
     genvar g;
     generate for(g=0;g<4;g=g+1) begin: LANES
-      assign lane_instruction[g] = instruction_memory[lane_pc[g]];
+      assign lane_instruction[g] = (lane_pc[g] < 256) ? instruction_memory[lane_pc[g]] : 32'h00000000;
       assign lane_mem_read[g] = private_memory[g][lane_mem_address[g]];
       dream_gpu_lane_v11 #(.WATCHDOG_LIMIT(WATCHDOG_LIMIT),.LANE_ID(g)) lane (
         .clk(clk),.reset(reset),.run_enable(run_enable),

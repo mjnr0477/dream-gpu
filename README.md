@@ -13,22 +13,22 @@ An experimental four-lane integer processor and host-integration project impleme
 - **v1.2** — memory-mapped host interface for instruction/data loading, start/stop, status, counters, PCs and accumulators.
 - **v1.3** — portable Python host driver with a transport abstraction.
 - **v1.4** — UART serial bridge and Python UART transport; end-to-end RTL serial simulation passes.
-- **v1.5** — board-neutral FPGA top-level with reset synchronizer, plus local HTTP runtime gateway with input validation, optional bearer-token authentication, serialized device access, bounded execution polling, and API tests; host soft reset enables clean repeated jobs.
+- **v1.5** — board-neutral FPGA top-level with reset synchronizer, plus local HTTP runtime gateway with input validation, optional bearer-token authentication, serialized device access, bounded execution polling, and API tests; host soft reset enables clean repeated jobs.\n- **v1.6** — 4x4 signed INT8 matrix-multiply unit, host registers, Python driver, runtime API endpoint, and signed arithmetic testbench.
 
-GitHub Actions runs inherited processor regressions, host-driver/API tests, UART integration simulation, and Yosys synthesis/structural checks. See the Actions tab for the current branch's exact run status.
+GitHub Actions runs inherited processor regressions, host-driver/API tests, UART integration simulation, INT8 tensor tests, and Yosys synthesis/structural checks. See the Actions tab for the current branch's exact run status.
 
 ## Important status and limitations
 
 DREAM GPU is currently an RTL design validated in simulation and generic Yosys synthesis/structural checks. **It is not yet a physical GPU, FPGA bitstream, fabricated chip, or deployed AI inference accelerator.**
 
-The runtime gateway is a processor execution API, not an LLM inference API. The current design has four integer lanes, integer accumulators, shared instruction memory, and lane-private scratch memory. It does not yet implement floating-point arithmetic, tensor/matrix instructions, neural-network operators, external DRAM, DMA, cache coherence, or an LLM runtime. DREAM AI must not route model inference to this device until suitable compute capabilities and physical board operation are demonstrated.
+The runtime gateway is a processor execution API, not an LLM inference API. The current design has four integer lanes, integer accumulators, shared instruction memory, and lane-private scratch memory. The v1.6 tensor block is only a small 4x4 signed INT8 matrix-multiply primitive. It does not yet implement floating-point arithmetic, larger tiled matrix operations, quantization scaling/zero-points, convolution, activation functions, transformer operators, external DRAM, DMA, cache coherence, or a complete LLM runtime. DREAM AI must not route model inference to this device until suitable compute capabilities and physical board operation are demonstrated.
 
 Physical deployment still requires a selected FPGA board, board-specific top-level and clock/reset integration, pin and electrical constraints, synthesis/place-and-route, timing closure, programming, and physical UART/functional tests. No board has been assumed or claimed.
 
 ## Repository layout
 
 - `rtl/` — processor RTL
-- `rtl/v1_0/` through `rtl/v1_4/` — versioned hardware stages
+- `rtl/v1_0/` through `rtl/v1_6/` — versioned hardware stages
 - `software/host/` — Python driver, UART transport, and local HTTP runtime
 - `verification/` — RTL testbenches and Python tests
 - `architecture/` — ISA, bus, and integration documentation
@@ -81,7 +81,7 @@ python software/host/dream_gpu_runtime.py --serial-port /dev/ttyUSB0 --baudrate 
 The API listens on `127.0.0.1:8765` by default. A non-loopback bind requires a bearer token of at least 24 characters. Use a TLS reverse proxy and firewall for any remote deployment; the built-in server does not provide TLS.
 
 - `GET /health` — checks register-level device responsiveness and reports capabilities.
-- `POST /v1/execute` — loads raw 32-bit instruction words, optionally preloads four lane-private memory banks, starts execution, and returns lane results.
+- `POST /v1/execute` — loads raw 32-bit instruction words, optionally preloads four lane-private memory banks, starts execution, and returns lane results.\n- `POST /v1/matmul/int8` — computes a 4x4 signed INT8 matrix product and returns signed INT32 outputs.
 
 ## Release archives
 
